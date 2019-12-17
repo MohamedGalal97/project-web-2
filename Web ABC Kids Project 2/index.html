@@ -1,0 +1,207 @@
+<html>
+
+	<style>
+	
+		body{
+			 color:#000000;
+  			 margin-left:0;
+   			 margin-right:0;
+   			 margin-top:0;
+   			 margin-bottom:0;
+   			 background-color:darkgrey; 
+		}
+		#header{
+			width: 250px;
+			margin-left:40%;
+			padding-top:5px;
+			background-color:powderblue;
+			color:azure;
+		}
+		.Container{
+			width:100%;
+			margin:auto;
+			background-color:powderblue;
+		}
+		#Container_Body{
+			
+			border:2px solid blue;
+			margin:auto;
+			margin-bottom:25px;
+		}
+		h1{
+		text-align:center;
+		background-color:darkslateblue;
+		font-size: 50pt;
+		}
+		h2{
+			background-color:azure;
+			margin-left:39%;
+			width: 280px;
+			color:blue;
+		}
+		img{
+			border: 1px solid black;
+			margin-top: 52px;
+            margin-left: 33%;
+		}
+		input{
+			margin-left:38%;
+			width:300px;
+			margin-top:13px;
+		}
+		
+		#btn_gen{
+			width:105px;
+			margin-left:45%;
+			margin-bottom: 10%;
+			margin-top: -4%;
+			padding:10px;
+			
+		}
+		
+		button{
+			width:50px;
+			margin-left:20%;
+			margin-bottom:40px;
+			padding:5px;
+		}	
+	</style>
+		<head>
+			<title>ABC Kids</title>
+		</head>
+	<body>
+		<div class="Container">
+			<div id="header">
+				 <h1>ABC Kids</h1>
+			</div>
+			<div id="Container_Body">
+				<h2> Learn The English Letters </h2>
+				<input type="number" id="user_inp" placeholder="Numbers of Letters">
+				<br>
+				<img id='Lett_img'>
+				<br>
+				<br>
+				<br>
+
+				<button id="btn_gen">Generate</button>
+				<br>
+				<div id='Alpha_buttons'></div>
+			</div>
+		</div>
+	</body>
+	
+	<script src='jquery-3.2.1.min.js'></script>
+	<script>
+	function template(target,type,date){
+		var v={
+			'target':target,
+			'type':type,
+			'date':date
+		}
+		return v;
+	}
+
+
+
+	var arrayStorage=[];
+	var xi=arrayStorage.length;
+		
+		window.addEventListener('load',function(e){
+			
+			var valueStorage=template(e.target.textContent,e.type,new Date())
+			arrayStorage[xi++]=valueStorage;
+			console.log(xi++);
+			localStorage.setItem("storage",JSON.stringify(arrayStorage));
+		});
+		window.addEventListener('unload',function(e){
+			
+			var valueStorage=template(e.target.textContent,e.type,new Date())
+			arrayStorage[xi++]=valueStorage;
+			console.log(xi++);
+			localStorage.setItem("storage",JSON.stringify(arrayStorage));
+		});
+		
+	
+	
+				
+	function Get_Random(min, max) {
+				return Math.floor(Math.random() * (max - min) ) + min;
+				}
+				
+				
+		
+		var Clear_Local_Storage = setInterval(clearLocalStorage, 5000);
+		function clearLocalStorage() {
+			
+			var storagedata=localStorage.getItem('storage');
+			if(localStorage.length>0){
+				$.ajax({
+				'type':'POST',
+				'url':'submit.php',
+				'data':{"storage":storagedata},
+				'success':function(response){
+				console.log(response);
+				localStorage.clear();
+				//remove elements on array
+				arrayStorage=[];
+				xi=0;
+				}
+				});
+			}	
+		}
+		
+		var Lett_img = document.getElementById('Lett_img');
+		var Alphabet_ASCI = ['Z','Y','X','W','V','U','T','S','R','Q','P','O','N','M','L','K','J','I','H','G','F','E','D','C','B','A'];
+		var Temp = document.getElementById('Alpha_buttons');
+		var My_Button = document.getElementById('btn_gen');
+		My_Button.addEventListener('click',function(e){
+			Lett_img.src='';
+			while (Temp.hasChildNodes()) {  
+				Temp.removeChild(Temp.firstChild);
+			}	
+			
+			console.log(arrayStorage.length);
+			
+			var valueStorage=template(e.target.textContent,e.type,new Date())
+			arrayStorage[xi++]=valueStorage;
+			console.log(xi);
+			localStorage.setItem("storage",JSON.stringify(arrayStorage));
+			
+		
+            var user_numOfLetters = document.getElementById("user_inp").value;
+			
+			if(user_numOfLetters > 26 || user_numOfLetters < 1)
+				alert("Error, Check The Number Again");
+				
+			else{
+			var Select_Alphabet = [];
+			for(var i = 0; i < user_numOfLetters; i++){
+				var Random = Get_Random(0,26);	
+						Select_Alphabet[i] = Alphabet_ASCI[Random];
+					}
+			for(var i = 0; i < Select_Alphabet.length; i++){
+				var My_Target = document.createElement('button');
+				var My_Text = document.createTextNode(Select_Alphabet[i]);
+				My_Target.appendChild(My_Text);
+				Temp.appendChild(My_Target);
+			}
+		var My_Buttons = document.getElementsByTagName('button');
+				for(var i = 0 ; i < My_Buttons.length; i++){
+					My_Buttons[i].addEventListener('click',function(e){	
+					var Alphabet=e.target.textContent;
+						if(Alphabet!='Generate'){
+							Lett_img.src='img/'+e.target.textContent+'.jpg';
+					
+							var valueStorage=template(e.target.textContent,e.type,new Date())
+							arrayStorage[xi++]=valueStorage;
+							console.log(xi);
+							localStorage.setItem("storage",JSON.stringify(arrayStorage));
+						}
+				});
+		}	
+		}
+		}
+		);
+		
+	</script>
+</html>
